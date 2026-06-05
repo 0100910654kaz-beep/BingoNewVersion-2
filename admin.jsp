@@ -47,7 +47,6 @@
     </style>
 
     <script>
-        // 大画面ウィンドウへの参照を子・親でしっかり紐付ける仕組み
         let screenWindow = null;
 
         window.addEventListener("keydown", function(event) {
@@ -64,11 +63,9 @@
             }
         }
 
-        // 大画面を開く、またはすでに開いている場合は再接続するロジック
         function openProjectorScreen() {
             screenWindow = window.open("", "BingoProjector", "width=1000,height=750,top=100,left=100,resizable=yes");
             
-            // 初回開いた時用のHTML骨組み（これ自体は一度ロードすればリロード不要）
             let htmlContent = '<html><head><title>ビンゴ中継大画面</title>' +
             '<style>' +
             'body { font-family: Arial, sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding: 40px; margin: 0; }' +
@@ -88,7 +85,6 @@
             '<div class="winner-box"><strong>🏆 ビンゴ達成者上位:</strong><br><ul id="p-list"></ul></div>' +
             '</body></html>';
             
-            // すでに開いている場合は中身を上書きしない（ホワイトアウトを防ぐため）
             if (screenWindow.document.getElementById('p-num') === null) {
                 screenWindow.document.open();
                 screenWindow.document.write(htmlContent);
@@ -97,9 +93,7 @@
             updateProjectorData(); 
         }
 
-        // 🚀【超重要】数字が引かれた瞬間、またはデータ同期時に大画面のHTMLを直接瞬時に書き換える処理
         function updateProjectorData() {
-            // すでに大画面が立ち上がっており、閉じられていない場合のみ実行
             if (screenWindow && !screenWindow.closed) {
                 try {
                     let pNum = screenWindow.document.getElementById('p-num');
@@ -107,19 +101,16 @@
                     let pList = screenWindow.document.getElementById('p-list');
                     let pBall = screenWindow.document.getElementById('p-ball');
 
-                    // 司会者画面の現在の最新データをそのままコピーして瞬時に書き換え
                     if(pNum) pNum.innerText = document.querySelector('.big-number').innerText;
                     if(pBall) pBall.innerText = document.getElementById('adminBallCounter').innerText;
                     if(pGrid) pGrid.innerHTML = document.querySelector('.history-grid').innerHTML.replace(/history-cell/g, 'cell').replace(/newest/g, 'new');
                     if(pList) pList.innerHTML = document.getElementById('bingoList').innerHTML;
                 } catch(e) {
-                    // ページ遷移直後などで一時的にエラーになった場合はスキップ
                     console.log("大画面へのデータ書き換え待機中...");
                 }
             }
         }
 
-        // 5秒ごとの司会者画面（裏側）データ自動更新ロジック
         setInterval(function() {
             fetch('BingoServlet?userType=admin')
                 .then(response => response.text())
@@ -128,13 +119,11 @@
                     let doc = parser.parseFromString(html, 'text/html');
                     if(doc.querySelector('.admin-container')) {
                         document.querySelector('.admin-container').innerHTML = doc.querySelector('.admin-container').innerHTML;
-                        // 裏側で通信が成功したら大画面も自動同期
                         updateProjectorData();
                     }
                 });
         }, 5000);
 
-        // 初回ロード時、もしすでに大画面の名前を持つウィンドウがあれば自動で同期構造を復元
         window.onload = function() {
             screenWindow = window.open("", "BingoProjector");
             if (screenWindow && screenWindow.document.getElementById('p-num') !== null) {
@@ -197,14 +186,24 @@
             <div class="panel">
                 <h3>🏆 ビンゴ達成者一覧</h3>
                 <ul id="bingoList">
-                    <% List<PlayerResult> bingoList = game.getBingoPlayers();
-                       // ★ここだけをパターン2の逆ループに変更
-                       for (int i = bingoList.size() - 1; i >= 0; i--) {
+                    <% 
+                       List<PlayerResult> bingoList = game.getBingoPlayers();
+                       int totalCount = bingoList.size();
+                       
+                       // サーバーから来るリスト（最新が0番目）をそのまま上から順に処理する
+                       for (int i = 0; i < totalCount; i++) {
                            PlayerResult p = bingoList.get(i);
-                           int currentRank = i + 1; %>
+                           
+                           // 【修正の核心】
+                           // 最初の人（一番最後のインデックス）が「1位」になり、
+                           // 最新の人（0番目のインデックス）が「現在の最大順位（例：3位）」になります
+                           int currentRank = totalCount - i; 
+                    %>
                         <li><strong><%= currentRank %>位</strong>: <%= p.getPlayerName() %> さん <span style="color:#e63946; font-weight:bold;">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span></li>
-                    <% } 
-                       if (bingoList.isEmpty()) { %> <p style="color:#888;">まだビンゴした人はいません</p> <% } %>
+                    <% 
+                       } 
+                       if (bingoList.isEmpty()) { %> <p style="color:#888;">まだビンゴした人はいません</p> <% } 
+                    %>
                 </ul>
 
                 <h3 style="margin-top: 25px;">🔥 リーチの人（全自動検知）</h3>

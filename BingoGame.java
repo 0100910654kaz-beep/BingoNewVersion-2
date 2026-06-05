@@ -13,7 +13,7 @@ public class BingoGame implements Serializable {
 
     private String gameId;                             // 部屋番号（ゲームID）
     private List<Integer> drawnNumbers;                // 当選番号の履歴
-    private List<PlayerResult> bingoPlayers;           // ビンゴ達成者のリスト（★古い順に保持）
+    private List<PlayerResult> bingoPlayers;           // ビンゴ達成者のリスト
     private List<PlayerResult> reachPlayers;           // リーチ達成者のリスト
     private List<String> allPlayers;                   // 全参加者の名前リスト
     private Date expireTime;                           // この部屋の有効期限
@@ -102,7 +102,7 @@ public class BingoGame implements Serializable {
         }
     }
 
-    // カード1枚のリーチ・ビンゴ判定ロジック（大山さんの元コードをベースに安全化）
+    // カード1枚のリーチ・ビンゴ判定ロジック
     private List<String> scanSingleCard(List<List<String>> card) {
         List<String> waitNumbers = new ArrayList<>();
         boolean[][] marked = new boolean[5][5];
@@ -141,7 +141,7 @@ public class BingoGame implements Serializable {
             if (missingCount == 1 && !waitNumbers.contains(missingVal)) waitNumbers.add(missingVal);
         }
 
-        // 斜め（左上から右下）のチェック
+        // 斜め（左上から右下）
         int missingCountD1 = 0;
         String missingValD1 = "";
         for (int i = 0; i < 5; i++) {
@@ -149,7 +149,7 @@ public class BingoGame implements Serializable {
         }
         if (missingCountD1 == 1 && !waitNumbers.contains(missingValD1)) waitNumbers.add(missingValD1);
 
-        // 斜め（右上から左下）のチェック
+        // 斜め（右上から左下）
         int missingCountD2 = 0;
         String missingValD2 = "";
         for (int i = 0; i < 5; i++) {
@@ -170,13 +170,13 @@ public class BingoGame implements Serializable {
         return waitNumbers;
     }
 
-    // ビンゴ達成者の登録処理（一番後ろに追加して古い順にします）
+    // ビンゴ達成者の登録処理
     private void addBingoPlayer(String name, int currentDrawnNumber) {
         for (PlayerResult p : bingoPlayers) {
             if (p.getPlayerName().equals(name)) return;
         }
         Date now = new Date();
-        bingoPlayers.add(new PlayerResult(name, now, currentDrawnNumber));
+        bingoPlayers.add(0, new PlayerResult(name, now, currentDrawnNumber));
         this.lastBingoTime = now;
         removeReachPlayer(name);
     }

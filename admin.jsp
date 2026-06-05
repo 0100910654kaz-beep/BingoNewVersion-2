@@ -197,11 +197,14 @@
             <div class="panel">
                 <h3>🏆 ビンゴ達成者一覧</h3>
                 <ul id="bingoList">
-                    <% int rank = 1;
-                       for (PlayerResult p : game.getBingoPlayers()) { %>
-                        <li><strong><%= rank %>位</strong>: <%= p.getPlayerName() %> さん <span style="color:#e63946; font-weight:bold;">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span></li>
-                    <% rank++; } 
-                       if (game.getBingoPlayers().isEmpty()) { %> <p style="color:#888;">まだビンゴした人はいません</p> <% } %>
+                    <% List<PlayerResult> bingoList = game.getBingoPlayers();
+                       // ★ここだけをパターン2の逆ループに変更
+                       for (int i = bingoList.size() - 1; i >= 0; i--) {
+                           PlayerResult p = bingoList.get(i);
+                           int currentRank = i + 1; %>
+                        <li><strong><%= currentRank %>位</strong>: <%= p.getPlayerName() %> さん <span style="color:#e63946; font-weight:bold;">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span></li>
+                    <% } 
+                       if (bingoList.isEmpty()) { %> <p style="color:#888;">まだビンゴした人はいません</p> <% } %>
                 </ul>
 
                 <h3 style="margin-top: 25px;">🔥 リーチの人（全自動検知）</h3>

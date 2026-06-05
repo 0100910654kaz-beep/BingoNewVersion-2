@@ -93,23 +93,18 @@
                 <h3>🏆 ビンゴ達成者一覧</h3>
                 <ul id="bingoList">
                     <% 
-                       // 1. Javaから現在のリストを取得する
                        List<PlayerResult> rawPlayers = game.getBingoPlayers();
-                       
-                       // 2. 画面表示用に「古い順（達成したのが早い順）」に並び替えた新しいリストを作る
                        List<PlayerResult> displayPlayers = new ArrayList<>(rawPlayers);
-                       Collections.reverse(displayPlayers); // 先頭追加の逆、つまり古い順にする
+                       Collections.reverse(displayPlayers); // 早い順に並び替え
 
-                       // 3. 古い順のリストを上からスキャンして順位（同着スキップ）を計算して表示する
                        int currentRank = 1;
                        for (int i = 0; i < displayPlayers.size(); i++) {
                            PlayerResult p = displayPlayers.get(i);
                            
-                           // 2人目以降の場合、前の人とビンゴした時の当選番号を比べる
                            if (i > 0) {
                                PlayerResult prev = displayPlayers.get(i - 1);
                                if (p.getDrawnNumberAtBingo() != prev.getDrawnNumberAtBingo()) {
-                                   currentRank = i + 1; // 当選番号が違っていれば、その時点の人数（i+1）に順位をスキップ
+                                   currentRank = i + 1; // 同着なら順位をスキップ
                                }
                            }
                     %>

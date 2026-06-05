@@ -102,7 +102,7 @@ public class BingoGame implements Serializable {
         }
     }
 
-    // カード1枚のリーチ・ビンゴ判定ロジック
+    // カード1枚のリーチ・ビンゴ判定ロジック（大山さんの元コードをベースに安全化）
     private List<String> scanSingleCard(List<List<String>> card) {
         List<String> waitNumbers = new ArrayList<>();
         boolean[][] marked = new boolean[5][5];
@@ -141,7 +141,7 @@ public class BingoGame implements Serializable {
             if (missingCount == 1 && !waitNumbers.contains(missingVal)) waitNumbers.add(missingVal);
         }
 
-        // 斜め（左上から右下）
+        // 斜め（左上から右下）のチェック
         int missingCountD1 = 0;
         String missingValD1 = "";
         for (int i = 0; i < 5; i++) {
@@ -149,13 +149,13 @@ public class BingoGame implements Serializable {
         }
         if (missingCountD1 == 1 && !waitNumbers.contains(missingValD1)) waitNumbers.add(missingValD1);
 
-        // 斜め（右上から左下）
-        int realD2Count = 0;
-        String realD2Val = "";
+        // 斜め（右上から左下）のチェック
+        int missingCountD2 = 0;
+        String missingValD2 = "";
         for (int i = 0; i < 5; i++) {
-            if (!marked[i][4 - i]) { realD2Count++; realD2Val = card.get(i).get(4 - i); }
+            if (!marked[i][4 - i]) { missingCountD2++; missingValD2 = card.get(i).get(4 - i); }
         }
-        if (realD2Count == 1 && !waitNumbers.contains(realD2Val)) waitNumbers.add(realD2Val);
+        if (missingCountD2 == 1 && !waitNumbers.contains(missingValD2)) waitNumbers.add(missingValD2);
 
         // 完全ビンゴのチェック
         boolean hasBingoLine = false;

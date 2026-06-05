@@ -161,7 +161,7 @@
         <div class="big-number"><%= game.getDrawnNumbers().isEmpty() ? "待機中" : game.getDrawnNumbers().get(game.getDrawnNumbers().size() - 1) %></div>
 
         <div id="adminBallCounter" style="font-size:18px; font-weight:bold; color:#555; margin-bottom:10px;">
-            現在の玉数: <%= ballCount %> / 75 球
+            残り玉数: <%= 75 - ballCount %> 球
         </div>
 
         <div class="control-box">
@@ -190,13 +190,8 @@
                        List<PlayerResult> bingoList = game.getBingoPlayers();
                        int totalCount = bingoList.size();
                        
-                       // サーバーから来るリスト（最新が0番目）をそのまま上から順に処理する
                        for (int i = 0; i < totalCount; i++) {
                            PlayerResult p = bingoList.get(i);
-                           
-                           // 【修正の核心】
-                           // 最初の人（一番最後のインデックス）が「1位」になり、
-                           // 最新の人（0番目のインデックス）が「現在の最大順位（例：3位）」になります
                            int currentRank = totalCount - i; 
                     %>
                         <li><strong><%= currentRank %>位</strong>: <%= p.getPlayerName() %> さん <span style="color:#e63946; font-weight:bold;">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span></li>

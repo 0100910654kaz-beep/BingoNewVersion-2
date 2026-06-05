@@ -13,7 +13,7 @@ public class BingoGame implements Serializable {
 
     private String gameId;                             // 部屋番号（ゲームID）
     private List<Integer> drawnNumbers;                // 当選番号の履歴
-    private List<PlayerResult> bingoPlayers;           // ビンゴ達成者のリスト（古い順に保持）
+    private List<PlayerResult> bingoPlayers;           // ビンゴ達成者のリスト（★古い順に保持）
     private List<PlayerResult> reachPlayers;           // リーチ達成者のリスト
     private List<String> allPlayers;                   // 全参加者の名前リスト
     private Date expireTime;                           // この部屋の有効期限
@@ -115,7 +115,6 @@ public class BingoGame implements Serializable {
                 } else {
                     int num = Integer.parseInt(val);
                     if (drawnNumbers.contains(num)) {
-                        marked[r][num == 0 ? 0 : c]; // 安全なインデックスアクセス
                         marked[r][c] = true;
                     }
                 }

@@ -92,38 +92,17 @@
             <div class="panel">
                 <h3>🏆 ビンゴ達成者一覧</h3>
                 <ul id="bingoList">
-                    <% 
-                       List<PlayerResult> players = game.getBingoPlayers();
-                       
-                       // 同着（スキップ方式）のリアルタイムランキング順位計算ロジック
-                       int currentRank = 1;
-                       for (int i = 0; i < players.size(); i++) {
-                           PlayerResult p = players.get(i);
-                           
-                           // 2人目以降の場合、前の人とビンゴした当選番号を比較する
-                           if (i > 0) {
-                               PlayerResult prev = players.get(i - 1);
-                               if (p.getDrawnNumberAtBingo() != prev.getDrawnNumberAtBingo()) {
-                                   currentRank = i + 1; // 当選番号が違っていれば順位をスキップ
-                               }
-                           }
-                    %>
-                        <li>
-                            <strong><%= currentRank %>位</strong>: <%= p.getPlayerName() %> さん 
-                            <span style="color:#e63946; font-weight:bold;">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span>
-                        </li>
-                    <% 
-                       } 
-                       if (players.isEmpty()) { 
-                    %> 
-                        <p style="color:#888;">まだビンゴした人はいません</p> 
-                    <% } %>
+                    <% int rank = 1;
+                       for (PlayerResult p : game.getBingoPlayers()) { %>
+                        <li><strong><%= rank %>位</strong>: <%= p.getPlayerName() %> さん <span style=\"color:#e63946; font-weight:bold;\">(🔑<%= p.getDrawnNumberAtBingo() %>番でビンゴ!)</span></li>
+                    <% rank++; } 
+                       if (game.getBingoPlayers().isEmpty()) { %> <p style="color:#888;">まだビンゴした人はいません</p> <% } %>
                 </ul>
 
                 <h3 style="margin-top: 25px;">🔥 リーチの人（全自動検知）</h3>
                 <ul>
                     <% for (PlayerResult p : game.getReachPlayers()) { %>
-                        <li><strong><%= p.getPlayerName() %> さん</strong></li>
+                        <li><strong><%= p.getPlayerName() %> さん</strong> <span style="color: #ff9800; font-size: 14px; font-weight: bold;">（あと <%= game.getWaitNumbers(p.getPlayerName()) %> 番でビンゴ！）</span></li>
                     <% } 
                        if (game.getReachPlayers().isEmpty()) { %> <p style="color:#888;">まだリーチの人はいません</p> <% } %>
                 </ul>
